@@ -1,4 +1,28 @@
 
+![image](./images/logo.png)
+
+## Problem description
+Over the last few years, the demand for AI professionals has grown rapidly, but the job market remains opaque for both candidates and employers.  
+AI engineers, data scientists and ML practitioners often struggle to answer simple but important questions:
+- What salary can I realistically expect given my skills and experience?
+- How much do salaries differ between countries, company sizes, and job titles?
+- Do remote roles pay more or less than on-site positions?
+- Which combinations of experience level, skills, and location are associated with higher pay?
+
+
+The project uses the [Global AI Job Market & Salary Trends 2025](https://www.kaggle.com/datasets/bismasajjad/global-ai-job-market-and-salary-trends-2025?) dataset from Kaggle, which contains synthetic but realistic data about AI-related jobs: job titles, experience level, salary (USD and local), location, company size, remote ratio, benefits score, required skills, education level, and other features.
+
+The goal is to solve the following problem:
+
+> Predict the expected salary (salary_usd) for a job in the AI field based on its characteristics and analyze which factors have the biggest impact on pay.
+
+This includes:
+- performing EDA to understand salary patterns across roles, countries, experience levels, and remote ratio;
+- training a regression model that predicts salary based on job attributes.
+
+The final solution can help users explore AI job-market trends and estimate salary ranges for different job profiles.
+
+
 ## Data Specification
 
 https://www.kaggle.com/datasets/bismasajjad/global-ai-job-market-and-salary-trends-2025?resource=download
