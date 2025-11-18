@@ -227,9 +227,15 @@ XGBoost is the final chosen model for deployment.
 
 ### Run Locally
 
+Clone repo
+```
+git clone git@github.com:oleksiyo/ai_job_salary_predict.git
+```
+
+
 1. Create virtual environment
 ```
-python3 -m venv venv
+python3.11 -m venv venv
 source venv/bin/activate
 ```
 
