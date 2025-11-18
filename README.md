@@ -139,7 +139,15 @@ The dataset not contains missing values.
 
 
 ### 7. EDA Conclusion
-??????????????
+The EDA reveals several important insights about the AI job market:
+
+- The salary distribution is highly skewed, and applying a log transformation greatly stabilizes variance.
+- Job titles, required skills, and country-level effects are the strongest predictors of salary.
+- Numerical variables such as years_experience show meaningful correlation with pay, while others (remote_ratio, benefits_score) contribute only marginally.
+- Skills extracted from job descriptions contain high predictive value and significantly enhance the model.
+- No major data quality issues were found, and missing values were handled safely.
+
+These findings guided the selection of models, feature engineering approach, and choice of XGBoost as the final model.
 
 
 ## Modeling approach & metrics
@@ -219,6 +227,45 @@ To further improve performance, we tuned the two best-performing models:
 
 ### Final Verdict
 XGBoost is the final chosen model for deployment.
+
+
+## Project Structure 
+
+```
+ai_job_salary_predict/
+│
+├── train.py               # Trains the model and saves model.bin + dv.bin
+├── predict.py             # Loads artifacts and performs a sample prediction
+├── serve.py               # FastAPI web service exposing /predict and /health
+│
+├── model.bin              # Trained XGBoost regression model
+├── dv.bin                 # DictVectorizer for feature encoding
+│
+├── requirements.txt       # Python dependencies for local and Docker use
+├── Dockerfile             # Containerization setup for the API
+│
+├── notebook.ipynb         # Full EDA, modeling, tuning, and analysis
+├── images/                # All plots and visualizations used in README
+│   ├── 001.png
+│   ├── 002.png
+│   ├── 003.png
+│   ├── ...
+│
+└── README.md              # Project documentation (this file)
+
+```
+
+
+### From Notebook to Scripts
+
+The original development and experimentation were performed in `notebook.ipynb`.  
+For production and reproducibility, the logic was refactored into three scripts:
+
+- **train.py** — loads the dataset, performs preprocessing, trains XGBoost, and saves `model.bin` and `dv.bin`.
+- **predict.py** — loads the saved artifacts and performs a single prediction from CLI.
+- **serve.py** — exposes the prediction pipeline as a FastAPI web service.
+
+This ensures the project can be reproduced end-to-end without Jupyter.
 
 
 
@@ -317,17 +364,139 @@ Example response:
 
 ## Next Steps
 
+Despite achieving with the tuned XGBoost model, several opportunities remain to further improve and extend the project:
+
+1. Explore alternative models — compare XGBoost with CatBoost and LightGBM, which natively handle categorical features and may further reduce RMSE.
+
+2. Implement monitoring and drift detection — track model performance over time and detect changes in job market trends or data distribution.
+
+3. Add batch prediction and model metadata endpoints — extend the API with `/predict_batch` and `/model/info` for better usability.
+4. Error handler.
 
 
 ## Cloud
 
+1. Install AWS CLI + login:
+```
+aws configure
+```
+
+2. Cerate ECR repository:
+```
+aws ecr create-repository --repository-name ai-job-model
+```
+
+Result:
+![image](./images/aws_002.png)
 
 
-python3 -m venv venv
-source venv/bin/activate
-pip install -U pip
-pip install xgboost
-pip install joblib
 
-pip install wordcloud
-pip install uvicorn
+3. Login in ECR:
+```
+aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin <ECR_ID>.dkr.ecr.eu-central-1.amazonaws.com
+```
+
+Result:
+![image](./images/aws_004.png)
+
+
+4. Buil Docker:
+```
+docker build -t ai-job-model .
+```
+
+Result:
+![image](./images/aws_003.png)
+
+
+
+5. Pushing:
+```
+docker tag ai-job-model:latest <ECR_ID>.dkr.ecr.eu-central-1.amazonaws.com/ai-job-model:latest
+docker push <ECR_ID>.dkr.ecr.eu-central-1.amazonaws.com/ai-job-model:latest
+```
+
+Result:
+![image](./images/aws_005.png)
+
+
+6. Create Lambda from a container:
+
+AWS Console → Lambda → Create function → Container image
+
+Result:
+![image](./images/aws_006.png)
+
+Select an image from ECR
+
+
+
+Result:
+![image](./images/aws_007.png)
+
+
+
+7. Open API Gateway
+
+Go to AWS Console:
+https://console.aws.amazon.com/apigateway
+
+
+7.1. Create API
+Select:
+API Gateway → APIs
+
+7.2.Select lambda function. (Region should be the same as lambda's)
+
+![image](./images/aws_008.png)
+
+If asked 'Grant API Gateway permission to invoke your Lambda function?' then click Allow
+
+
+7.3. Create Route
+
+![image](./images/aws_009.png)
+
+
+Select 
+- Method: POST
+- Path: /predict
+
+![image](./images/aws_010.png)
+
+Select: Attach integration → Lambda function 
+
+![image](./images/aws_011.png)
+
+7.4. Deploy
+
+Click on Deploy button.
+
+![image](./images/aws_012.png)
+
+
+8. Testing
+
+``` curl
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"job_title": "Machine Learning Engineer",
+           "salary_currency": "USD",
+           "years_experience": 5,
+           "employment_type": "FT",
+           "remote_ratio": 100,
+           "company_size": "m",
+           "company_location": "US",
+           "industry": "IT",
+           "required_skills": "python, machine learning, deep learning"}' \
+  https://<API_ID>.execute-api.us-east-1.amazonaws.com/predict
+
+```
+
+
+Example response:
+```json
+{
+  "predicted_salary_usd": 119744.14
+}
+```
