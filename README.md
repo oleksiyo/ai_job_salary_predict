@@ -401,8 +401,8 @@ Result:
 
 5. Pushing:
 ```
-docker tag ai-job-model:latest <ECR_ID>.dkr.ecr.eu-central-1.amazonaws.com/ai-job-model:latest
-docker push <ECR_ID>.dkr.ecr.eu-central-1.amazonaws.com/ai-job-model:latest
+docker tag ai-job-model:latest <ECR_ID>.dkr.ecr.us-east-1.amazonaws.com/ai-job-model:latest
+docker push <ECR_ID>.dkr.ecr.us-east-1.amazonaws.com/ai-job-model:latest
 ```
 
 Result:
