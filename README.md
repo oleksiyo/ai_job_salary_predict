@@ -84,19 +84,19 @@ This produces a more Gaussian-like distribution, which benefits linear and tree-
 
 ### 2. Categorical features
 
-- job_title — high cardinality, strong differentiator (e.g., AI Research Scientist > MLE > Data Analyst)
-- company_location & employee_residence — consistent salary variation across regions
-- company_size — balanced categories (s / m / l)
-- employment_type — mostly full-time jobs (FT), which aligns with industry expectations
-- salary_currency — mostly USD; EUR/GBP values were safely handled through log-transform or one-hot encoding.
+- **job_title** — high cardinality, strong differentiator (e.g., AI Research Scientist > MLE > Data Analyst)
+- **company_location** & **employee_residence** — consistent salary variation across regions
+- **company_size** — balanced categories (s / m / l)
+- **employment_type** — mostly full-time jobs (FT), which aligns with industry expectations
+- **salary_currency** — mostly USD; EUR/GBP values were safely handled through log-transform or one-hot encoding.
 
 These categorical columns were encoded using DictVectorizer, which creates a sparse one-hot representation suitable for tree-based models.
 
 ### 3. Numerical Features
 
-- years_experience — shows meaningful positive correlation with salary
-- remote_ratio — near-zero correlation, but still included as a potential interaction feature
-- benefits_score — minimal effect, confirmed via correlation heatmap
+- **years_experience** — shows meaningful positive correlation with salary
+- **remote_ratio** — near-zero correlation, but still included as a potential interaction feature
+- **benefits_score** — minimal effect, confirmed via correlation heatmap
 
 Outliers exist, but thanks to log transformation, they do not destabilize the model.
 
@@ -106,7 +106,7 @@ Using RandomForestRegressor on the full feature space, we identified the most pr
 
 <div align="center"> <img src="./images/006.png" width="650"> </div>
 
-Interpretation:
+**Interpretation**:
 
 - Job description content (e.g., keyword-based features) is highly predictive
 
@@ -122,14 +122,13 @@ This confirms that both job attributes and country effects play central roles in
 ### 5. Skills Analysis
 
 The required_skills column was parsed into a list of skills.
+
 Top skills include:
 
 - python
-- machine learning
-- deep learning
-- tensorflow / pytorch
-- statistics
 - SQL
+- tensorflow
+
 
 ![image](./images/002.png)
 
@@ -161,18 +160,18 @@ A simple and interpretable model used as the baseline.
 It helps identify whether the dataset exhibits primarily linear relationships.
 While fast to train, it underperforms on complex feature interactions.
 
-2. **Decision Tree Regressor**
+2. **Decision Tree**
 
 A non-linear model that splits data based on feature thresholds.
-Useful for capturing simple patterns, but prone to overfitting and limited in generalization unless heavily regularized (e.g., shallow depth).
+Useful for capturing simple patterns, but prone to overfitting and limited in generalization unless heavily regularized.
 
-3. **Random Forest Regressor**
+3. **Random Forest**
 
 An ensemble of multiple decision trees.
 It reduces overfitting by averaging predictions across many randomized trees.
 Performs significantly better than a single tree and handles high-dimensional one-hot encoded data well.
 
-4. **XGBoost — Final & Best-Performing Model**
+4. **XGBoost**
 
 An optimized and highly efficient implementation of gradient boosting.
 XGBoost handles sparse one-hot encoded data extremely well, allows fine-grained regularization, and consistently outperformed all other models in this project.
@@ -194,7 +193,7 @@ Performance Before Hyperparameter Tuning
 
 ![image](./images/004.png)
 
-**Interpretation**
+**Interpretation**:
 
 - Linear Regression serves as a strong baseline thanks to the log-transformed target.
 - Decision Tree performed poorly due to overfitting and limited ability to generalize.
@@ -215,7 +214,7 @@ To further improve performance, we tuned the two best-performing models:
 ![image](./images/005.png)
 
 
-**Interpretation**
+**Interpretation**:
 
 - Tuning provided only marginal improvement for Random Forest, indicating the model was already close to optimal.
 
@@ -362,18 +361,6 @@ Example response:
 ```
 
 
-## Next Steps
-
-Despite achieving with the tuned XGBoost model, several opportunities remain to further improve and extend the project:
-
-1. Explore alternative models — compare XGBoost with CatBoost and LightGBM, which natively handle categorical features and may further reduce RMSE.
-
-2. Implement monitoring and drift detection — track model performance over time and detect changes in job market trends or data distribution.
-
-3. Add batch prediction and model metadata endpoints — extend the API with `/predict_batch` and `/model/info` for better usability.
-4. Error handler.
-
-
 ## Cloud
 
 1. Install AWS CLI + login:
@@ -393,8 +380,10 @@ Result:
 
 3. Login in ECR:
 ```
-aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin <ECR_ID>.dkr.ecr.eu-central-1.amazonaws.com
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ECR_ID>.dkr.ecr.us-east-1.amazonaws.com
 ```
+
+Use ECR_ID from prev step
 
 Result:
 ![image](./images/aws_004.png)
@@ -500,3 +489,18 @@ Example response:
   "predicted_salary_usd": 119744.14
 }
 ```
+
+
+## Next Steps
+
+Despite achieving with the tuned XGBoost model, several opportunities remain to further improve and extend the project:
+
+1. Explore alternative models — compare XGBoost with CatBoost and LightGBM, which natively handle categorical features and may further reduce RMSE.
+
+2. Implement monitoring and drift detection — track model performance over time and detect changes in job market trends or data distribution.
+
+3. Add batch prediction and model metadata endpoints — extend the API with `/predict_batch` and `/model/info` for better usability.
+
+4. Error handler.
+
+5. Auto deploy to cloud.
