@@ -376,7 +376,13 @@ aws ecr create-repository --repository-name ai-job-model
 Result:
 ![image](./images/aws_002.png)
 
+In every ECR image URI, the first part is your ECR account identifier:
+```
+123456789012.dkr.ecr.eu-central-1.amazonaws.com/ai-job-model:latest
+```
+`123456789012` → ECR_ID (your AWS Account ID)
 
+Save your ERC_ID.
 
 3. Login in ECR:
 ```
