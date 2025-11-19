@@ -460,6 +460,7 @@ Select: Attach integration → Lambda function
 7.4. Deploy
 
 Click on Deploy button.
+If need create stage.
 
 ![image](./images/aws_012.png)
 
@@ -478,7 +479,7 @@ curl -X POST \
            "company_location": "US",
            "industry": "IT",
            "required_skills": "python, machine learning, deep learning"}' \
-  https://<API_ID>.execute-api.us-east-1.amazonaws.com/predict
+  https://<API_ID>.execute-api.us-east-1.amazonaws.com/ai_job_model/predict
 
 ```
 
